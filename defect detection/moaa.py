@@ -1,7 +1,7 @@
 import sys
 
-sys.path.append("../../")
-sys.path.append("../../parser")
+sys.path.append("../")
+sys.path.append("../parser")
 
 from run_parser import get_identifiers, get_example
 import logging
@@ -43,14 +43,15 @@ class MOAA:
         orig_prob = np.max(prob)
         query_times = 0
         flag_success = False  # whether we have found the first adversarial example in our algorithm
-
+        is_success = 0
+        identifiers, code_tokens = get_identifiers(orig_code, "c")
+        identifiers = [i[0] for i in identifiers]
         if orig_label != label:  # the original code is misclassified
             is_success = -4
         elif len(identifiers) == 0:  # no identifier in the code
             is_success = -3
         else:  # begin to attack
-            identifiers, code_tokens = get_identifiers(orig_code, "c")
-            identifiers = [i[0] for i in identifiers]
+            
             names_positions_dict = get_identifier_posistions_from_code(
                 code_tokens, identifiers
             )
@@ -78,9 +79,8 @@ class MOAA:
                 self.parent_pop.indi[i].function_eval(
                     self.model,
                     self.tokenizer,
-                    self.t5_model,
-                    self.t5_tokenizer,
                     self.t5_emb_model,
+                    self.t5_tokenizer
                 )
                 if flag_success == False:
                     query_times += 1
@@ -100,9 +100,8 @@ class MOAA:
                     self.offspring_pop.indi[j].function_eval(
                         self.model,
                         self.tokenizer,
-                        self.t5_model,
-                        self.t5_tokenizer,
                         self.t5_emb_model,
+                        self.t5_tokenizer,
                     )
                     if flag_success == False:
                         query_times += 1

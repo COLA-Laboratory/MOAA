@@ -1,8 +1,8 @@
 import os
-import sys  # NOQA: E402
+import sys
 
-sys.path.append("../../")  # NOQA: E402
-sys.path.append("../../parser")  # NOQA: E402
+sys.path.append("../")
+sys.path.append("../parser")
 from transformers import (
     RobertaConfig,
     RobertaForSequenceClassification,
@@ -35,8 +35,8 @@ def load_victim_model(model_type, saved_victim_path):
         encoder = RobertaForSequenceClassification.from_pretrained(
             "microsoft/codebert-base", config=config
         )
-        model = CodeBERTModel(model, config, tokenizer)
-        model.load_state_dict(torch.load(saved_victim_path))
+        model = CodeBERTModel(encoder, config, tokenizer)
+        # model.load_state_dict(torch.load(saved_victim_path))
         model.to("cuda")
         logger.info("Loaded victim model from {}.".format(saved_victim_path))
     elif model_type == "graphcodebert":
@@ -66,7 +66,7 @@ def load_victim_model(model_type, saved_victim_path):
                 model_type
             )
         )
-    return model
+    return model, tokenizer
 
 
 def main():
@@ -79,7 +79,7 @@ def main():
         help="The path to the attacked data file",
     )
     parser.add_argument(
-        "--saved_victim_path",
+        "--saved_victim_model_path",
         required=True,
         type=str,
         help="The output directory where the model predictions and checkpoints will be written.",
@@ -120,25 +120,13 @@ def main():
     torch.cuda.manual_seed_all(args.seed)
 
     # load victim model
-    config = RobertaConfig.from_pretrained("microsoft/codebert-base")
-    config.num_labels = 1
-    tokenizer = RobertaTokenizer.from_pretrained("microsoft/codebert-base")
-    encoder = RobertaForSequenceClassification.from_pretrained(
-        "microsoft/codebert-base", config=config
-    )
-
-    model = Model(model, config, tokenizer)
-    checkpoint_prefix = "checkpoint-best-acc/model.bin"
-    model_dir = os.path.join(args.saved_dir, "{}".format(checkpoint_prefix))
-    model.load_state_dict(torch.load(model_dir))
-    model.to("cuda")
-    logger.info("Loaded victim model from {}.".format(model_dir))
+    model, tokenizer = load_victim_model(args.model_type, args.saved_victim_model_path)
 
     # load T5 model
     codet5_path = "Salesforce/codet5-base"
     t5_tokenizer = RobertaTokenizer.from_pretrained(codet5_path)
     t5_model = T5ForConditionalGeneration.from_pretrained(codet5_path)
-    model_dir = os.path.join(args.saved_dir, "{}".format("codet5/pytorch_model.bin"))
+    model_dir = "./saved_models/assisted_model/pytorch_model.bin"
     t5_model.load_state_dict(torch.load(model_dir))
     t5_model.to("cuda")  # this model is for identifier prediction
     logger.info("Loaded CodeT5 model from{}.".format(model_dir))

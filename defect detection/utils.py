@@ -1,7 +1,7 @@
 import sys
 
-sys.path.append("../../")
-sys.path.append("../../parser")
+sys.path.append("../")
+sys.path.append("../parser")
 import numpy as np
 import random
 import torch
@@ -24,7 +24,7 @@ def get_identifier_posistions_from_code(words_list: list, variable_names: list) 
 class Example:
     """A single test example."""
 
-    def __init__(self, idx, source, target, substitues):
+    def __init__(self, idx, source, target):
         self.idx = idx
         self.source = source
         self.target = target
@@ -85,54 +85,54 @@ class Individual:
                     break
                 cnt += 1
 
-        def function_eval(self, model, tokenizer, t5_emb_model, t5_tokenizer):
-            for i in range(len(self.identifiers)):
-                for j in self.pos_dict[i]:
-                    self.tokens_[j] = self.identifiers[i]
+    def function_eval(self, model, tokenizer, t5_emb_model, t5_tokenizer):
+        for i in range(len(self.identifiers)):
+            for j in self.pos_dict[i]:
+                self.tokens_[j] = self.identifiers[i]
 
-            prob = self.model.predict(" ".join(self.tokens_))
-            self.label_ = np.argmax(prob)
-            self.obj_[0] = 1 - prob[self.orig_label]
+        prob = model.predict(" ".join(self.tokens_))
+        self.label_ = np.argmax(prob)
+        self.obj_[0] = 1 - prob[self.orig_label]
 
-            modified_pos = []
-            code_input = []
-            for i in range(len(self.identifiers)):
-                if self.identifiers[i] != self.orig_identifiers[i]:
-                    modified_pos.append(i)
-                    code_input.append(self.identifiers[i])
-                    code_input.append(self.orig_identifiers[i])
-            if len(modified_pos) == 0:
-                self.obj_[1] = 0.0
-                self.obj_[2] = 0.0
-            else:
-                input_ids = t5_tokenizer(
-                    code_input, return_tensors="pt", padding=True
-                ).input_ids
-                output = t5_emb_model(input_ids.to("cuda")).last_hidden_state
-                cos = nn.CosineSimilarity(dim=1, eps=1e-6)
+        modified_pos = []
+        code_input = []
+        for i in range(len(self.identifiers)):
+            if self.identifiers[i] != self.orig_identifiers[i]:
+                modified_pos.append(i)
+                code_input.append(self.identifiers[i])
+                code_input.append(self.orig_identifiers[i])
+        if len(modified_pos) == 0:
+            self.obj_[1] = 0.0
+            self.obj_[2] = 0.0
+        else:
+            input_ids = t5_tokenizer(
+                code_input, return_tensors="pt", padding=True
+            ).input_ids
+            output = t5_emb_model(input_ids.to("cuda")).last_hidden_state
+            cos = nn.CosineSimilarity(dim=1, eps=1e-6)
 
-                f2 = 0.0
-                for i in range(len(modified_pos)):
-                    output1 = output[2 * i]
-                    output2 = output[2 * i + 1]
-                    f2 += (
-                        1
-                        - sum(cos(output1, output2).cpu().detach().numpy())
-                        / output1.shape[0]
-                    )
-                self.obj_[1] = f2
+            f2 = 0.0
+            for i in range(len(modified_pos)):
+                output1 = output[2 * i]
+                output2 = output[2 * i + 1]
+                f2 += (
+                    1
+                    - sum(cos(output1, output2).cpu().detach().numpy())
+                    / output1.shape[0]
+                )
+            self.obj_[1] = f2
 
-                # calculate f3
-                modified_size = 0.0
-                for i in range(len(modified_pos)):
-                    modified_size += len(self.pos_dict[i])
-                self.obj_[2] = modified_size / len(self.tokens_)
+            # calculate f3
+            modified_size = 0.0
+            for i in range(len(modified_pos)):
+                modified_size += len(self.pos_dict[i])
+            self.obj_[2] = modified_size / len(self.tokens_)
 
-        def copy(self, src):
-            self.tokens_ = src.tokens_[:]
-            self.identifiers = src.identifiers[:]
-            self.obj_ = src.obj_[:]
-            self.fitness = src.fitness
+    def copy(self, src):
+        self.tokens_ = src.tokens_[:]
+        self.identifiers = src.identifiers[:]
+        self.obj_ = src.obj_[:]
+        self.fitness = src.fitness
 
 
 class Population:
@@ -160,7 +160,7 @@ class Population:
         arr2 = np.arange((int)(self.pop_num))
         np.random.shuffle(arr1)
         np.random.shuffle(arr2)
-        for i in range(pop_num / 2):
+        for i in range(int(pop_num / 2)):
             parent1 = TournamentByRank(
                 parent_pop.indi[arr1[2 * i]], parent_pop.indi[arr1[2 * i + 1]]
             )
@@ -170,9 +170,9 @@ class Population:
             self.indi[2 * i], self.indi[2 * i + 1] = SBX(
                 parent1, parent2, self.indi[2 * i], self.indi[2 * i + 1]
             )
-        self.pop_num = 2 * (pop_num / 2)
+        self.pop_num = 2 * (int(pop_num / 2))
 
-    def environment_selection(self, offspring_pop, mixed_pop):
+    def environmental_selection(self, offspring_pop, mixed_pop):
 
         mixed_pop.set_individuals(self.indi + offspring_pop.indi)
         mixed_pop = NonDominatedSort(mixed_pop, mixed_pop.indi[0].obj_num_)
