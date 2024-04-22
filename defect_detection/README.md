@@ -56,6 +56,7 @@ python finetune_codebert.py \
     --tokenizer_name=microsoft/codebert-base \
     --model_name_or_path=microsoft/codebert-base \
     --do_train \
+    --do_test \
     --train_data_file=./dataset/train.jsonl \
     --eval_data_file=./dataset/valid.jsonl \
     --test_data_file=./dataset/test.jsonl \
@@ -72,18 +73,18 @@ python finetune_codebert.py \
 ### GraphCodeBERT
 ```shell
 python finetune_graphcodebert.py \
-    --output_dir=./saved_models \
+    --output_dir=./saved_models/GraphCodeBERT \
     --model_type=roberta \
     --config_name=microsoft/graphcodebert-base \
     --tokenizer_name=microsoft/graphcodebert-base \
     --model_name_or_path=microsoft/graphcodebert-base \
-    --do_eval \
+    --do_train \
     --do_test \
-    --train_data_file=../preprocess/dataset/train.jsonl \
-    --eval_data_file=../preprocess/dataset/valid.jsonl \
-    --test_data_file=../preprocess/dataset/test.jsonl \
+    --train_data_file=./dataset/train.jsonl \
+    --eval_data_file=./dataset/valid.jsonl \
+    --test_data_file=./dataset/test.jsonl \
     --epoch 5 \
-    --code_length 512 \
+    --code_length 384 \
     --data_flow_length 128 \
     --train_batch_size 32 \
     --eval_batch_size 64 \
@@ -95,7 +96,8 @@ python finetune_graphcodebert.py \
 
 ### CodeT5
 ```shell
-
+python finetune_codet5.py \
+    --
 ```
 
 ## MOAA
