@@ -1,0 +1,5 @@
+python==3.9.18
+torch==2.2.0
+transformers==4.37.2
+pandas==2.2.0
+tree-sitter==0.20.4

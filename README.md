@@ -1,14 +1,13 @@
 # MOAA
 
 ## Overview
-This repository contains Python implementation of the algorithm framework for Multi-Objective Adversarial Attack for FSE'24 review
+This repository contains Python implementation of the algorithm framework for Multi-Objective Adversarial Attack for FSE'24
 
 ## Code Structure
 <pre>
 MOAA/
 ├── README.md
 ├── requirement.txt
-├── setup.py
 ├── parser/
 ├── defect_detection/
 │   ├── dataset/

@@ -62,8 +62,8 @@ python finetune_codebert.py \
     --test_data_file=./dataset/test.jsonl \
     --epoch 5 \
     --block_size 512 \
-    --train_batch_size 24 \
-    --eval_batch_size 64 \
+    --train_batch_size 16 \
+    --eval_batch_size 32 \
     --learning_rate 2e-5 \
     --max_grad_norm 1.0 \
     --evaluate_during_training \
@@ -91,13 +91,30 @@ python finetune_graphcodebert.py \
     --learning_rate 2e-5 \
     --max_grad_norm 1.0 \
     --evaluate_during_training \
-    --seed 123456 2>&1 | tee test.log
+    --seed 123456 2>&1 | tee train.log
 ```
 
 ### CodeT5
 ```shell
-python finetune_codet5.py \
-    --
+CUDA_VISIBLE_DEVICES=1 python finetune_codet5.py \
+    --output_dir=./saved_models/CodeT5 \
+    --model_type=codet5 \
+    --tokenizer_name=Salesforce/codet5-base \
+    --model_name_or_path=Salesforce/codet5-base \
+    --do_train \
+    --do_eval \
+    --do_test \
+    --train_data_file=./dataset/train.jsonl \
+    --eval_data_file=./dataset/valid.jsonl \
+    --test_data_file=./dataset/valid.jsonl \
+    --cache_path=./dataset \
+    --epoch 5 \
+    --max_source_length 512 \
+    --train_batch_size 8 \
+    --eval_batch_size 16 \
+    --learning_rate 2e-5 \
+    --max_grad_norm 1.0 \
+    --seed 123456  2>&1 | tee train.log
 ```
 
 ## MOAA
@@ -106,5 +123,5 @@ python attack.py \
     --data_file=./dataset/test.jsonl \
     --saved_victim_model_path=./saved_models/CodeBERT/checkpoint-best-acc/model.bin \
     --model_type=codebert \
-    --attack_numbers  100 2>&1 | tee train.log
+    --attack_numbers  100 2>&1 | tee moaa.log
 ```
