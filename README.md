@@ -37,4 +37,4 @@ MOAA/
     - tree-sitter: tested in 0.20.4
 
 ## Assisted Model
-the assisted model can be download from this [link](https://www.dropbox.com/scl/fo/lnpsmhz8r2t0v5zf54icm/ADCNILAttESRwpmLh2U8xVY?rlkey=9w78dvgehz9tpndmj369yvpt4&st=pa0d0c7x&dl=0).
+the assisted model can be download from this [link](https://zenodo.org/records/14876109).
