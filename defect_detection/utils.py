@@ -3,6 +3,16 @@ import numpy as np
 import random
 import torch
 import torch.nn as nn
+import os
+
+
+def set_seed(seed=42):
+    random.seed(seed)
+    os.environ['PYHTONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
 
 
 def get_identifier_posistions_from_code(words_list: list, variable_names: list) -> dict:
