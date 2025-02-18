@@ -781,7 +781,7 @@ def main():
     else:
         model = model_class(config)
 
-    model = CodeBERTModel(model, config, tokenizer, args)
+    model = CodeBERTModel(model, config, tokenizer)
     if args.local_rank == 0:
         torch.distributed.barrier()  # End of barrier to make sure only the first process in distributed training download model & vocab
 
