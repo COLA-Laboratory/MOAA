@@ -153,7 +153,7 @@ class MOAA:
                         orig_label,
                         success,
                         ",".join(identifiers),
-                        ",".join(indi.identifiers_),
+                        ",".join(indi.identifiers),
                         orig_prob,
                         indi.obj_[0],
                         indi.obj_[1],
