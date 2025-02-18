@@ -34,7 +34,7 @@ def load_victim_model(model_type, saved_victim_path):
             "microsoft/codebert-base", config=config
         )
         model = CodeBERTModel(encoder, config, tokenizer)
-        # model.load_state_dict(torch.load(saved_victim_path))
+        model.load_state_dict(torch.load(saved_victim_path))
         model.to("cuda")
         logger.info("Loaded victim model from {}.".format(saved_victim_path))
     elif model_type == "graphcodebert":
